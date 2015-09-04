@@ -139,8 +139,8 @@ namespace RakLib
 			return size;
 		}
 
-		return size;
 		this->_mut->unlock();
+		return size;
 	}
 
 	bool UDPSocket::close()

@@ -37,7 +37,7 @@ namespace RakLib
 		for (Packet* packet : this->packets)
 		{
 			this->putByte(0x00); //set the flag. reliability and has split
-			this->putShort(packet->getLength() * 8); // Length in bits
+			this->putShort((short)packet->getLength() * 8); // Length in bits
 			this->putByte(packet->getBuffer(), this->getLength());
 		}
 	}
@@ -54,7 +54,7 @@ namespace RakLib
 		while (this->position < this->length) {
 			uint8 flag = this->getByte();
 			uint8 reliability = (flag & 0xE0) >> 5;
-			bool hasSplit = (flag & 0x10);
+			bool hasSplit = (flag & 0x10) > 0;
 
 			uint16 length = ((this->getShort() + 7) >> 3); // The Length is in bits, so Bits to Bytes conversion
 

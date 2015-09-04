@@ -29,28 +29,31 @@ namespace RakLib
 		};
 
 	protected:
-		const std::string ip;
-		const uint16 port;
-		State currentState;
+		const std::string _ip;
+		const uint16 _port;
+		State _currentState;
 
-		int CID;
+		long _clientID;
 
 	private:
-		int lastSequenceNum;
-		int sequenceNum;
-		int messageIndex;
+		int _lastSequenceNum;
+		int _sequenceNum;
+		int _messageIndex;
 
 	protected:
-		uint16 mtuSize;
+		uint16 _mtuSize;
 
 	private:
-		//CustomPacket* queue;
-		std::vector<uint32> ACKQueue; // Received Packet Queue
-		std::vector<uint32> NACKQueue; // Not received packet queue
-		//std::map<uint32, CustomPacket> recoveryQueue; // Packet sent queue to be used if not received
+		//CustomPacket* _queue;
+		std::vector<uint32> _ACKQueue; // Received Packet Queue
+		std::vector<uint32> _NACKQueue; // Not received packet queue
+		//std::map<uint32, CustomPacket> _recoveryQueue; // Packet sent queue to be used if not received
 
 	public:
+		Session();
 		Session(std::string ip, unsigned short port, long clientID, short mtu);
+
+		Session& operator=(const Session&) { return *this; }
 
 		virtual void receivePackets(Packet* packet);
 
@@ -59,9 +62,9 @@ namespace RakLib
 		virtual void addToQueue(DataPacket* packet, QueuePriority priority);
 		virtual void sendPacket(Packet* packet) = 0; 
 		
-		const std::string& getIP() const;
-		uint16 getPort() const;
-		State getState() const;
+		inline const std::string& getIP() const { return this->_ip; };
+		inline uint16 getPort() const { return this->_port; };
+		inline State getState() const { return this->_currentState; };
 
 	};
 }

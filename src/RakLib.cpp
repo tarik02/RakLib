@@ -6,7 +6,7 @@
 #include "RakLib/Packets/Request2.h"
 #include "RakLib/Packets/UnConnectedPing.h"
 #include "RakLib/Packets/UnConnectedPong.h"
-
+#include "RakLib/Session.h"
 
 namespace RakLib
 {
@@ -60,7 +60,7 @@ namespace RakLib
 
 		this->_isRunning = true;
 		this->_socket = std::make_shared<UDPSocket>(UDPSocket(this->_ip, (uint16) this->_port));
-		this->_mainThread = new std::thread(&run, this);
+		this->_mainThread = new std::thread(&RakLib::run, this);
 	}
 
 	void RakLib::run()
@@ -116,7 +116,7 @@ namespace RakLib
 				reply.port = pck->port;
 
 				this->_socket->send(&reply);
-				this->_sessionManager->addSession(this->getPlayerIdentifier(pck->ip, pck->port), new Session(pck->ip, pck->port, request.clientID, reply.mtuSize));
+				this->_sessionManager->addSession(pck->ip, pck->port, request.clientID, reply.mtuSize);
 
 			}
 			break;
