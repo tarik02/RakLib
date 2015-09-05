@@ -27,7 +27,9 @@ namespace RakLib
 			this->position = 0;
 		}
 
-		DataPacket(int size) : Packet(size) {}
+		DataPacket(Packet* packet) : Packet(packet) {}
+
+		DataPacket(uint32 size) : Packet(size) {}
 
 		virtual void encode() { };
 		virtual void decode() { };

@@ -14,7 +14,7 @@ namespace RakLib
 	class RakLib
 	{
 	private:
-		std::shared_ptr<UDPSocket> _socket;
+		UDPSocket* _socket;
 		SessionManager* _sessionManager;
 		std::thread* _mainThread;
 
@@ -24,7 +24,7 @@ namespace RakLib
 		bool _isRunning;
 
 	public:
-		RakLib(const std::string& ip, uint16 port, SessionManager* sessionManager);
+		RakLib(std::string ip, uint16 port, SessionManager* sessionManager);
 		~RakLib();
 
 		inline const std::string& getIP() const { return this->_ip; };

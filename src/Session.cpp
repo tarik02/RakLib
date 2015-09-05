@@ -53,12 +53,19 @@ namespace RakLib
 			printf("CustomPacket Received: 0x%02X", packetID);
 			CustomPacket customPacket(packet);
 			customPacket.decode();
+
+			this->_ACKQueue.push_back(customPacket.sequenceNumber);
+
 			for (InternalPacket* internalPacket : customPacket.packets)
 			{
 				//TODO: Handle splitted packets
 				DataPacket dataPacket(internalPacket);
 				this->handleDataPacket(&dataPacket);
+
+				internalPacket->close();
+				delete internalPacket;
 			}
+			customPacket.packets.clear();
 		}
 		else
 		{

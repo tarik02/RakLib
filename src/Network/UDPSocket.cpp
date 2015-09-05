@@ -11,18 +11,12 @@
 
 #include "RakLib/Network/UDPSocket.h" 
 
+#include <iostream>
+
 namespace RakLib
 {
-
-	UDPSocket::UDPSocket() : UDPSocket("", DEFAULT_PORT){}
-
-	UDPSocket::UDPSocket(short port) : UDPSocket("", port) {}
-
-	UDPSocket::UDPSocket(std::string ip) : UDPSocket(ip, DEFAULT_PORT) {}
-
 	UDPSocket::UDPSocket(std::string ip, short port)
 	{
-		this->_mut = new std::mutex();
 
 		this->isRuning = false;
 
@@ -31,21 +25,20 @@ namespace RakLib
 			return;
 #endif 
 
-		if (this->sock = socket(AF_INET, SOCK_DGRAM, 0) == INVALID_SOCKET)
+		if ((this->sock = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 		{
-			std::string error = "Could not create the socket!";
+			std::cout << "Could not create the socket! Error Code: ";
 #ifdef WIN32 
-			error.assign("Error Code: " + WSAGetLastError());
+			std::cout << WSAGetLastError() << std::endl;
 			WSACleanup();
 #else 
-			error.assign("Error Code: -1");
+			std::cout << "-1" << std::endl;
 #endif 
-
-			throw std::runtime_error(error.c_str());
+			return;
 		}
 
 		this->isStarted = true;
-		this->bind(ip.c_str(), port) == 0 ? this->isRuning = true : this->isRuning = false;
+		this->bind(ip, port) == 0 ? this->isRuning = true : this->isRuning = false;
 	}
 
 	int UDPSocket::bind(std::string ip, short port)
@@ -63,23 +56,20 @@ namespace RakLib
 
 		if (::bind(this->sock, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) == -1)
 		{
-			std::string error = "Could not create the socket!";
+			std::cout << "Could not bind the socket! Error Code: ";
 #ifdef WIN32 
-			error.assign("Error Code: " + WSAGetLastError());
+			std::cout << WSAGetLastError() << std::endl;
 			WSACleanup();
 #else 
-			error.assign("Error Code: -1");
-#endif 
-
-			throw std::runtime_error(error.c_str());
+			std::cout << "-1" << std::endl;
+#endif
+			return 1;
 		}
 		return 0;
 	}
 
 	Packet* UDPSocket::receive()
 	{
-		this->_mut->lock();
-
 		struct sockaddr_in recv;
 		this->buffer = (unsigned char*)malloc(BUFFER_SIZE);
 
@@ -88,13 +78,13 @@ namespace RakLib
 
 		if (size == -1)
 		{
-			std::string error = std::string("[SOCKET][ERROR] Could not be sended the Packet!");
+			std::cout << "Could not receive the packet! Error Code: ";
 #ifdef WIN32 
-			error.append(" Error Code: " + WSAGetLastError());
-#else
-			error.append(" Error Code: " + size);
-#endif 
-			std::runtime_error(error.c_str());
+			std::cout << WSAGetLastError() << std::endl;
+			WSACleanup();
+#else 
+			std::cout << "-1" << std::endl;
+#endif
 
 			this->_mut->unlock();
 			this->close();
@@ -109,14 +99,11 @@ namespace RakLib
 		pck->ip.assign(ip);
 		pck->port = (uint16_t)recv.sin_port;
 
-		this->_mut->unlock();
 		return pck;
 	}
 
 	int UDPSocket::send(Packet* pck)
 	{
-		this->_mut->lock();
-
 		struct sockaddr_in sendaddr;
 		sendaddr.sin_family = AF_INET;
 		sendaddr.sin_port = pck->port;
@@ -125,21 +112,19 @@ namespace RakLib
 		int size = sendto(this->sock, (char*)pck->getBuffer(), pck->getLength(), 0, (struct sockaddr*)&sendaddr, sizeof(struct sockaddr_in));
 		if (size == -1)
 		{
-			std::string error = std::string("[SOCKET][ERROR] Could not be sended the Packet!");
-
+			std::cout << "Could not send the packet! Error Code: ";
 #ifdef WIN32 
-			error.append(" Error Code: " + WSAGetLastError());
-#else
-			error.append(" Error Code: " + size);
+			std::cout << WSAGetLastError() << std::endl;
+			WSACleanup();
+#else 
+			std::cout << "-1" << std::endl;
 #endif 
-			std::runtime_error(error.c_str());
 
 			this->_mut->unlock();
 			this->close();
 			return size;
 		}
 
-		this->_mut->unlock();
 		return size;
 	}
 

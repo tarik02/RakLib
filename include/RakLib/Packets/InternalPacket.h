@@ -25,7 +25,7 @@ namespace RakLib
 	public:
 		uint8* buff;
 		uint32 length;
-		uint8 reliability = -1;
+		uint8 reliability = 0;
 		bool hasSplit = false;
 		int messageIndex = -1;
 		int orderIndex = -1;

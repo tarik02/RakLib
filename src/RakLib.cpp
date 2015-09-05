@@ -10,7 +10,7 @@
 
 namespace RakLib
 {
-	RakLib::RakLib(const std::string& ip, uint16 port, SessionManager* sessionManager)
+	RakLib::RakLib(std::string ip, uint16 port, SessionManager* sessionManager)
 	{
 		this->_ip = ip;
 		this->_port = port;
@@ -33,13 +33,13 @@ namespace RakLib
 			throw std::runtime_error("There is no sessions manager!");
 
 		this->_isRunning = true;
-		this->_socket = std::make_shared<UDPSocket>(UDPSocket(this->_ip, (uint16) this->_port));
+		this->_socket = new UDPSocket(this->_ip, (uint16) this->_port);
 		this->_mainThread = new std::thread(&RakLib::run, this);
 	}
 
 	void RakLib::run()
 	{
-		while (this->_isRunning && this->_sessionManager)
+		while (this->_isRunning && this->_sessionManager != nullptr)
 		{
 			Packet* pck = this->_socket->receive();
 			uint8 pid = pck->getBuffer()[0];
@@ -51,9 +51,9 @@ namespace RakLib
 			{
 				UnConnectedPing ping(pck);
 				ping.decode();
+					
 
-
-				UnConnectedPong pong(123456789, ping.pingID, "Minecraft Server!");
+				UnConnectedPong pong(123456789, ping.pingID, "MCPE;Minecraft Server!;27;0.11.0;0;20");
 				pong.encode();
 
 				pong.ip = pck->ip;

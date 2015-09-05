@@ -22,11 +22,11 @@ namespace RakLib
 	{
 	public:
 
-		virtual bool addSession(std::string ip, unsigned short port, long clientID, unsigned short mtu) {};
+		virtual bool addSession(std::string ip, unsigned short port, long clientID, unsigned short mtu) = 0;
 
-		virtual bool removeSession(std::string ip, unsigned short port) {};
+		virtual bool removeSession(std::string ip, unsigned short port) = 0;
 
-		virtual Session* getSession(std::string ip, unsigned short port) {};
+		virtual Session* getSession(std::string ip, unsigned short port) = 0;
 
 	};
 }

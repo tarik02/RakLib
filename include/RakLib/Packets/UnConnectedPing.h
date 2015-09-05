@@ -24,7 +24,7 @@ namespace RakLib
 	public:
 		UnConnectedPing(Packet* pck);
 
-		void decode();
+		void decode() override;
 
 	};
 }

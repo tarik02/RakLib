@@ -24,7 +24,7 @@ namespace RakLib
 			packet->reliability = (flags & 0xE0) >> 5;
 			packet->hasSplit = (flags & 0x10) > 0;
 
-			packet->length = (int)ceil(pck->getShort() / 8);
+			packet->length = (uint32)ceil(pck->getShort() / 8);
 			/*
 			* From http://www.jenkinssoftware.com/raknet/manual/reliabilitytypes.html
 			*
