@@ -15,7 +15,7 @@ namespace RakLib
 	{
 	private:
 		std::shared_ptr<UDPSocket> _socket;
-		std::shared_ptr<SessionManager> _sessionManager;
+		SessionManager* _sessionManager;
 		std::thread* _mainThread;
 
 		std::string _ip;
@@ -24,18 +24,14 @@ namespace RakLib
 		bool _isRunning;
 
 	public:
-		RakLib(uint16 port);
-		RakLib(const std::string& ip, uint16 port);
 		RakLib(const std::string& ip, uint16 port, SessionManager* sessionManager);
 		~RakLib();
 
-		const std::string& getIP() const;
-		uint16_t getPort() const;
-		bool isRunning() const;
+		inline const std::string& getIP() const { return this->_ip; };
+		inline uint16_t getPort() const { return this->_port; };
+		inline bool isRunning() const { return this->_isRunning; };
 
 		void sendPacket(Packet* packet);
-
-		void setSessionManager(SessionManager* sessionManager);
 
 		std::string getPlayerIdentifier(const std::string& ip, uint16_t port);
 

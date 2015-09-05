@@ -10,44 +10,18 @@
 
 namespace RakLib
 {
-	RakLib::RakLib(uint16 port) : RakLib("0.0.0.0", port) {}
-
-	RakLib::RakLib(const std::string& ip, uint16 port)
+	RakLib::RakLib(const std::string& ip, uint16 port, SessionManager* sessionManager)
 	{
 		this->_ip = ip;
 		this->_port = port;
 		this->_isRunning = false;
-	}
-
-	RakLib::RakLib(const std::string& ip, uint16 port, SessionManager* sessionManager) : RakLib(ip, port)
-	{
-		this->_sessionManager = std::make_shared<SessionManager>(&sessionManager);
-	}
-
-	const std::string& RakLib::getIP() const
-	{
-		return this->_ip;
-	}
-
-	unsigned short RakLib::getPort() const
-	{
-		return this->_port;
-	}
-
-	bool RakLib::isRunning() const
-	{
-		return this->_isRunning;
+		this->_sessionManager = sessionManager;
 	}
 
 	std::string RakLib::getPlayerIdentifier(const std::string& ip, uint16 port)
 	{
 		std::string retval(ip.c_str());
 		return retval.append(":" + port);
-	}
-
-	void RakLib::setSessionManager(SessionManager* sessionManager)
-	{
-		this->_sessionManager = std::make_shared<SessionManager>(&sessionManager);
 	}
 
 	void RakLib::start()
@@ -120,8 +94,8 @@ namespace RakLib
 
 			}
 			break;
-			}
 
+			}
 			delete pck;
 		}
 	}
