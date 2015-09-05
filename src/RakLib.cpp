@@ -95,6 +95,16 @@ namespace RakLib
 			}
 			break;
 
+			default:
+			{
+				Session* session = this->_sessionManager->getSession(pck->ip, pck->port);
+				if (session == nullptr)
+					break;
+
+				session->receivePacket(pck);
+			}
+			break;
+
 			}
 			delete pck;
 		}

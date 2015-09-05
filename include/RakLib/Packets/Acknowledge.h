@@ -8,27 +8,29 @@
 *
 *
 */
-
-#ifndef LOGIN_PACKET_H_
-#define LOGIN_PACKET_H_
+#ifndef ACKNOWLEDGE_H_
+#define ACKNOWLEDGE_H_
 
 #include "../Network/Packet.h"
-#include "../Info.h"
+#include <vector>
+#include <algorithm>
 
 namespace RakLib
 {
-	class LoginPacket : public Packet 
+
+	class Acknowledge : public Packet
 	{
+	public:
+		std::vector<uint32> sequenceNumbers;
+		uint8 pid; // ACK || NACK
 
 	public:
-		LoginPacket();
-		LoginPacket(Packet* pck);
-		LoginPacket(uint32 size);
+		Acknowledge(uint8 pid, std::vector<uint32> sequenzeNum);
+		Acknowledge(Packet* pck);
 
-		virtual void decode();
-		virtual void encode();
+		void decode();
+		void encode();
 
-		uint8* getMagic();
 	};
 }
 #endif

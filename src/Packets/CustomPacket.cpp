@@ -8,72 +8,43 @@
 *
 *
 */
-
-
 #include "RakLib\Packets\CustomPacket.h"
 
 namespace RakLib
 {
-	CustomPacket::CustomPacket(Packet* packet) : Packet(packet)
-	{}
 
-	CustomPacket::CustomPacket(uint32 seqNumber) : sequenceNumber(seqNumber)
-	{}
+	CustomPacket::CustomPacket(Packet* packet) : Packet(packet) {}
 
-	CustomPacket::~CustomPacket()
+	CustomPacket::CustomPacket(uint8* data, uint32 size) : Packet(data, size) {}
+
+	CustomPacket::CustomPacket()
 	{
-		for (Packet* packet : this->packets) {
-			delete packet;
-		}
-		this->packets.clear();
+		this->packetID = 0x84;
 	}
 
+	uint32 CustomPacket::getLength(){
+		uint32 length = 4; // PacketID + sequence number(Triad)
+		for (InternalPacket* pck : this->packets){
+			length += pck->getLength();
+		}
+		return length;
+	}
 
-	// TODO: Handle the reliability
-	void CustomPacket::encode()
-	{
-		this->putByte(0x80); // The packet id can be 0x80-0x8F
+	void CustomPacket::decode() {
+		this->packetID = this->getByte();
+		this->sequenceNumber = this->getTriad();
+		int size = this->length - 4;
+		this->packets = InternalPacket::fromBinary(this->getByte(size), size);
+	}
+
+	void CustomPacket::encode(){
+		this->buffer = new uint8[this->getLength()];
+		this->putByte(this->packetID);
 		this->putLTriad(this->sequenceNumber);
-		for (Packet* packet : this->packets)
-		{
-			this->putByte(0x00); //set the flag. reliability and has split
-			this->putShort((short)packet->getLength() * 8); // Length in bits
-			this->putByte(packet->getBuffer(), this->getLength());
-		}
-	}
-
-	// TODO: Handle the reliability
-	void CustomPacket::decode()
-	{
-		uint8 id = this->getByte();
-		if (id < 0x80 || id > 0x8f)
-			throw std::runtime_error("Invalid Packet ID"); // This SHOULD never happen
-
-		this->sequenceNumber = this->getLTriad();
-
-		while (this->position < this->length) {
-			uint8 flag = this->getByte();
-			uint8 reliability = (flag & 0xE0) >> 5;
-			bool hasSplit = (flag & 0x10) > 0;
-
-			uint16 length = ((this->getShort() + 7) >> 3); // The Length is in bits, so Bits to Bytes conversion
-
-			if (reliability == 2 || reliability == 3 || reliability == 4 || reliability == 6 || reliability == 7) {
-				this->getLTriad(); // Message Index
-			}
-
-			if (reliability == 1 || reliability == 3 || reliability == 4 || reliability == 7) {
-				this->getLTriad(); // Order Index
-				this->getByte(); // Order Channel
-			}
-
-			if (hasSplit) {
-				this->getInt(); // Split Count
-				this->getShort(); // Split ID
-				this->getInt(); // Split Index
-			}
-
-			this->packets.push_back(new Packet(this->getByte(length), length));
+		for (InternalPacket* pck : packets){
+			Packet temp = pck->toBinary();
+			this->putByte(temp.getBuffer(), temp.getLength());
+			temp.close();
 		}
 	}
 }

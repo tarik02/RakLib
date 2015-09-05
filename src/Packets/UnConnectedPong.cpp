@@ -17,7 +17,7 @@ namespace RakLib
 	{
 		this->serverID = serverID;
 		this->pingID = pingID;
-		this->str = "MCCPP;Demo;" + title;
+		this->str = "MCPE;" + title + "27;0.11.0;0;20";//MCPE;ServerName;MCPEProtocol;MCPEVersion;Players;MaxPlayer
 	}
 
 	void UnConnectedPong::encode()

@@ -81,15 +81,15 @@ namespace RakLib
 
 		//Properties
 		virtual uint32 getLength() const;
-		uint32 getPosition() const;
 		uint8* getBuffer();
 
 		void setPosition(uint32);
+		uint32 getPosition() const;
 
-		void Resize(size_t);
-		void Print();
-		void Clear();
-		void Close();
+		void resize(size_t);
+		void print();
+		void clear();
+		void close();
 
 	};
 }

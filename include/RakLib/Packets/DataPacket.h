@@ -9,23 +9,28 @@
 *
 */
 
-#ifndef DATAPACKET_H_
-#define DATAPACKET_H_
+#ifndef DATA_PACKET_H_
+#define DATA_PACKET_H_
 
 #include "../Network/Packet.h"
+#include "InternalPacket.h"
 
 namespace RakLib
 {
 	class DataPacket : public Packet
 	{
 	public:
-		DataPacket(uint32 size) : Packet(size) {}
-		DataPacket(uint8* buffer, uint32 size) : Packet(buffer, size) {}
-		DataPacket(Packet* packet) : Packet(packet) {}
+		DataPacket(InternalPacket* pck)
+		{
+			this->buffer = pck->buff;
+			this->length = pck->length;
+			this->position = 0;
+		}
 
+		DataPacket(int size) : Packet(size) {}
 
-		virtual void encode() = 0;
-		virtual void decode() = 0;
+		virtual void encode() { };
+		virtual void decode() { };
 	};
 }
 #endif

@@ -8,42 +8,32 @@
 *
 *
 */
+#ifndef CUSTOM_PACKET_H_
+#define CUSTOM_PACKET_H_
 
-#ifndef CUSTOMPACKET_H_
-#define CUSTOMPACKET_H_
-
-#include "../Network/Packet.h"
-#include "DataPacket.h"
-
-#include <list>
+#include "InternalPacket.h"
 
 namespace RakLib
 {
-	enum Reliability
-	{
-		UNRELIABLE,
-		UNRELIABLE_SEQUENCED,
-		RELIABLE,
-		RELIABLE_ORDERED,
-		RELIABLE_SEQUENCED,
-		UNRELIABLE_WITH_ACK_RECEIPT,
-		RELIABLE_WITH_ACK_RECEIPT,
-		RELIABLE_ORDERED_WITH_ACK_RECEIPT
-	};
 
 	class CustomPacket : public Packet
 	{
 	public:
-		uint32 sequenceNumber;
-		std::list<Packet*> packets;
+		uint8 packetID;
+		int sequenceNumber;
+		std::vector<InternalPacket*> packets;
 
-
+	public:
 		CustomPacket(Packet* packet);
-		CustomPacket(uint32 seqNumber);
-		~CustomPacket();
+		CustomPacket(uint8* data, uint32 size);
+		CustomPacket();
+
+
+		uint32 getLength();
+
+		void decode();
 
 		void encode();
-		void decode();
 	};
 }
 #endif

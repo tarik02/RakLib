@@ -17,7 +17,7 @@ namespace RakLib
 
 	LoginPacket::LoginPacket(Packet* pck) : Packet(pck) {}
 
-	LoginPacket::LoginPacket(int size) : Packet(size) {}
+	LoginPacket::LoginPacket(uint32 size) : Packet(size) {}
 
 
 	void LoginPacket::encode(){}

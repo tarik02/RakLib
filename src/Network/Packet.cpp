@@ -300,7 +300,7 @@ namespace RakLib
 		this->position = v;
 	}
 
-	void Packet::Resize(size_t size) {
+	void Packet::resize(size_t size) {
 		uint8* temp = (uint8*)malloc(size);
 
 		size_t  newSize = size;
@@ -316,7 +316,7 @@ namespace RakLib
 		this->length = newSize;
 	}
 
-	void Packet::Print()
+	void Packet::print()
 	{
 		for (uint32 i = 0; i < this->length; i++)
 		{
@@ -326,13 +326,13 @@ namespace RakLib
 		}
 	}
 
-	void Packet::Clear() {
+	void Packet::clear() {
 		free(this->buffer);
 		this->buffer = (uint8*)malloc(this->length);
 		this->position = 0;
 	}
 
-	void Packet::Close() {
+	void Packet::close() {
 		free(this->buffer);
 		this->length = 0;
 		this->position = 0;
@@ -340,6 +340,6 @@ namespace RakLib
 
 	Packet::~Packet()
 	{
-		this->Close();
+		this->close();
 	}
 }
