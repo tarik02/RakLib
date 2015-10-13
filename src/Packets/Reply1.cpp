@@ -14,15 +14,13 @@
 namespace RakLib
 {
 
-	Reply1::Reply1(uint8 sec, long serverid, short mtu) : LoginPacket(28)
-	{
+	Reply1::Reply1(uint8 sec, long serverid, short mtu) : LoginPacket(28) {
 		this->Security = sec;
 		this->serverID = serverid;
 		this->mtuSize = mtu;
 	}
 
-	void Reply1::encode()
-	{
+	void Reply1::encode() {
 		this->putByte(Packets::CONNECTION_REPLY_1);
 		this->putByte(this->getMagic(), 16);
 		this->putLong(this->serverID);

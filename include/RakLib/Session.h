@@ -1,11 +1,23 @@
+/**
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* @author InusualZ
+*
+*
+*/
+
+
 #ifndef SESSION_H_
 #define SESSION_H_
 
-#include <vector>
 #include <map>
+#include <vector>
 
-#include "Packets\DataPacket.h"
 #include "Packets\CustomPacket.h"
+#include "Packets\DataPacket.h"
 #include "Network\Packet.h"
 
 namespace RakLib

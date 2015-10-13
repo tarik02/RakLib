@@ -46,7 +46,6 @@ namespace RakLib
 	private:
 		unsigned char* buffer;
 		bool isStarted;
-		std::mutex* _mut;
 
 	#ifdef WIN32
 		SOCKET sock;
@@ -65,12 +64,12 @@ namespace RakLib
 		UDPSocket(std::string ip, short port);
 		~UDPSocket();
 
-		int bind(std::string ip, short port);
+		bool bind(std::string ip, short port);
 
 		Packet* receive();
 		int send(Packet*);
 
-		bool close();
+		void close();
 
 	};
 }

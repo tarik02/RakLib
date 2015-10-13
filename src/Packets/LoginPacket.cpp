@@ -20,12 +20,11 @@ namespace RakLib
 	LoginPacket::LoginPacket(uint32 size) : Packet(size) {}
 
 
-	void LoginPacket::encode(){}
-	void LoginPacket::decode(){}
+	void LoginPacket::encode() {}
+	void LoginPacket::decode() {}
 
 
-	uint8* LoginPacket::getMagic()
-	{
+	uint8* LoginPacket::getMagic() {
 		return new uint8[16] { (uint8)0x00, (uint8)0xff, (uint8)0xff, (uint8)0x00, (uint8)0xfe, (uint8)0xfe, (uint8)0xfe, (uint8)0xfe, (uint8)0xfd, (uint8)0xfd, (uint8)0xfd, (uint8)0xfd, (uint8)0x12, (uint8)0x34, (uint8)0x56, (uint8)0x78 }; // 16 uint8_t
 	}
 }

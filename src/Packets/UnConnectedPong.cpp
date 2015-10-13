@@ -13,15 +13,13 @@
 
 namespace RakLib
 {
-	UnConnectedPong::UnConnectedPong(long serverID, long pingID, const std::string& title) : LoginPacket(35 + title.length())
-	{
+	UnConnectedPong::UnConnectedPong(long serverID, long pingID, const std::string& title) : LoginPacket(35 + title.length()) {
 		this->serverID = serverID;
 		this->pingID = pingID;
 		this->str = title; //MCPE;ServerName;MCPEProtocol;MCPEVersion;Players;MaxPlayer
 	}
 
-	void UnConnectedPong::encode()
-	{
+	void UnConnectedPong::encode() {
 		this->putByte(Packets::UNCONNECTED_PING);
 		this->putLong(this->pingID);
 		this->putLong(this->serverID);

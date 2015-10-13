@@ -17,8 +17,7 @@ namespace RakLib
 	Request2::Request2(Packet* packet) : LoginPacket(packet) {}
 
 
-	void Request2::decode()
-	{
+	void Request2::decode() {
 		this->position += 17;
 		this->Security = this->getByte();
 		this->Cookie = this->getInt();

@@ -10,42 +10,34 @@
 
 namespace RakLib
 {
-	RakLib::RakLib(std::string ip, uint16 port, SessionManager* sessionManager)
-	{
+	RakLib::RakLib(SessionManager* sessionManager, std::string ip, uint16 port) {
 		this->_ip = ip;
 		this->_port = port;
 		this->_isRunning = false;
 		this->_sessionManager = sessionManager;
 	}
 
-	std::string RakLib::getPlayerIdentifier(const std::string& ip, uint16 port)
-	{
+	std::string RakLib::getSessionIdentifier(const std::string& ip, uint16 port) {
 		std::string retval(ip.c_str());
 		return retval.append(":" + port);
 	}
 
-	void RakLib::start()
-	{
-		if (this->_isRunning)
+	void RakLib::start() {
+		if (this->_isRunning) {
 			throw std::runtime_error("RakLib already running!");
-
-		if (!this->_sessionManager)
-			throw std::runtime_error("There is no sessions manager!");
+		}
 
 		this->_isRunning = true;
-		this->_socket = new UDPSocket(this->_ip, (uint16) this->_port);
+		this->_socket = new UDPSocket(this->_ip, this->_port);
 		this->_mainThread = new std::thread(&RakLib::run, this);
 	}
 
-	void RakLib::run()
-	{
-		while (this->_isRunning && this->_sessionManager != nullptr)
-		{
+	void RakLib::run() {
+		while (this->_isRunning) {
 			Packet* pck = this->_socket->receive();
 			uint8 pid = pck->getBuffer()[0];
 
-			switch (pid)
-			{
+			switch (pid) {
 			case Packets::UNCONNECTED_PONG:
 			case Packets::UNCONNECTED_PONG_2:
 			{
@@ -110,15 +102,14 @@ namespace RakLib
 		}
 	}
 
-	void RakLib::sendPacket(Packet* packet)
-	{
+	void RakLib::sendPacket(Packet* packet) {
 		this->_socket->send(packet);
 	}
 
-	void RakLib::stop()
-	{
-		if (!this->_isRunning)
+	void RakLib::stop() {
+		if (!this->_isRunning) {
 			throw std::runtime_error("RakLib is not running!");
+		}
 
 		this->_isRunning = false;
 		this->_mainThread->join();

@@ -12,9 +12,9 @@
 #ifndef INTERNAL_PACKET_H_
 #define INTERNAL_PACKET_H_
 
-#include <vector>
 #include <algorithm>
 #include <iterator>
+#include <vector>
 
 #include "../Network/Packet.h"
 
@@ -27,12 +27,12 @@ namespace RakLib
 		uint32 length;
 		uint8 reliability = 0;
 		bool hasSplit = false;
-		int messageIndex = -1;
-		int orderIndex = -1;
-		uint8 orderChannel = (uint8)0xff;
-		int splitCount = -1;
-		short splitID = -1;
-		int splitIndex = -1;
+		uint32 messageIndex;
+		uint32 orderIndex;
+		uint8 orderChannel;
+		uint32 splitCount;
+		uint16 splitID;
+		uint32 splitIndex;
 
 	public:
 

@@ -1,10 +1,10 @@
 #ifndef RAKLIB_H_
 #define RAKLIB_H_
 
-#include <string>
 #include <memory>
-#include <stdexcept>
 #include <thread>
+#include <string>
+#include <stdexcept>
 
 #include "Network/UDPSocket.h"
 #include "SessionManager.h"
@@ -24,7 +24,7 @@ namespace RakLib
 		bool _isRunning;
 
 	public:
-		RakLib(std::string ip, uint16 port, SessionManager* sessionManager);
+		RakLib(SessionManager* sessionManager, std::string ip, uint16 port);
 		~RakLib();
 
 		inline const std::string& getIP() const { return this->_ip; };
@@ -33,7 +33,7 @@ namespace RakLib
 
 		void sendPacket(Packet* packet);
 
-		std::string getPlayerIdentifier(const std::string& ip, uint16_t port);
+		std::string getSessionIdentifier(const std::string& ip, uint16_t port);
 
 		void start();
 		void run();

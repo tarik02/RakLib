@@ -12,8 +12,8 @@
 #ifndef LOGIN_PACKET_H_
 #define LOGIN_PACKET_H_
 
-#include "../Network/Packet.h"
 #include "../Info.h"
+#include "../Network/Packet.h"
 
 namespace RakLib
 {

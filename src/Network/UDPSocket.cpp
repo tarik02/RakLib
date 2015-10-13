@@ -15,18 +15,17 @@
 
 namespace RakLib
 {
-	UDPSocket::UDPSocket(std::string ip, short port)
-	{
+	UDPSocket::UDPSocket(std::string ip, short port) {
 
 		this->isRuning = false;
 
 #ifdef WIN32 
-		if (WSAStartup(MAKEWORD(2, 2), &this->data) != 0)
+		if (WSAStartup(MAKEWORD(2, 2), &this->data) != 0) {
 			return;
+		}
 #endif 
 
-		if ((this->sock = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
-		{
+		if ((this->sock = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
 			std::cout << "Could not create the socket! Error Code: ";
 #ifdef WIN32 
 			std::cout << WSAGetLastError() << std::endl;
@@ -41,21 +40,20 @@ namespace RakLib
 		this->bind(ip, port) == 0 ? this->isRuning = true : this->isRuning = false;
 	}
 
-	int UDPSocket::bind(std::string ip, short port)
-	{
+	bool UDPSocket::bind(std::string ip, short port) {
 		struct sockaddr_in addr;
 		memset(&addr, 0, sizeof(addr));
 
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(port);
 
-		if (!ip.empty())
+		if (!ip.empty()) {
 			inet_pton(AF_INET, ip.c_str(), &addr.sin_addr);
-		else
+		} else {
 			addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		}
 
-		if (::bind(this->sock, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) == -1)
-		{
+		if (::bind(this->sock, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) == -1) {
 			std::cout << "Could not bind the socket! Error Code: ";
 #ifdef WIN32 
 			std::cout << WSAGetLastError() << std::endl;
@@ -63,21 +61,19 @@ namespace RakLib
 #else 
 			std::cout << "-1" << std::endl;
 #endif
-			return 1;
+			return true;
 		}
-		return 0;
+		return false;
 	}
 
-	Packet* UDPSocket::receive()
-	{
+	Packet* UDPSocket::receive() {
 		struct sockaddr_in recv;
 		this->buffer = (unsigned char*)malloc(BUFFER_SIZE);
 
 		int sie = sizeof(struct sockaddr_in);
 		socklen_t size = recvfrom(this->sock, (char*)this->buffer, BUFFER_SIZE, 0, (struct sockaddr*)&recv, (socklen_t*)&sie);
 
-		if (size == -1)
-		{
+		if (size == -1) {
 			std::cout << "Could not receive the packet! Error Code: ";
 #ifdef WIN32 
 			std::cout << WSAGetLastError() << std::endl;
@@ -86,7 +82,6 @@ namespace RakLib
 			std::cout << "-1" << std::endl;
 #endif
 
-			this->_mut->unlock();
 			this->close();
 			return nullptr;
 		}
@@ -102,16 +97,14 @@ namespace RakLib
 		return pck;
 	}
 
-	int UDPSocket::send(Packet* pck)
-	{
+	int UDPSocket::send(Packet* pck) {
 		struct sockaddr_in sendaddr;
 		sendaddr.sin_family = AF_INET;
 		sendaddr.sin_port = pck->port;
 		inet_pton(AF_INET, pck->ip.c_str(), &sendaddr.sin_addr);
 
 		int size = sendto(this->sock, (char*)pck->getBuffer(), pck->getLength(), 0, (struct sockaddr*)&sendaddr, sizeof(struct sockaddr_in));
-		if (size == -1)
-		{
+		if (size == -1) {
 			std::cout << "Could not send the packet! Error Code: ";
 #ifdef WIN32 
 			std::cout << WSAGetLastError() << std::endl;
@@ -119,8 +112,6 @@ namespace RakLib
 #else 
 			std::cout << "-1" << std::endl;
 #endif 
-
-			this->_mut->unlock();
 			this->close();
 			return size;
 		}
@@ -128,8 +119,7 @@ namespace RakLib
 		return size;
 	}
 
-	bool UDPSocket::close()
-	{
+	void UDPSocket::close() {
 #ifdef __unix__
 		close(this->sock);
 #elif defined(_WIN32)
@@ -140,11 +130,9 @@ namespace RakLib
 		free(this->buffer);
 		this->isRuning = false;
 		this->isStarted = false;
-		return true;
 	}
 
-	UDPSocket::~UDPSocket()
-	{
+	UDPSocket::~UDPSocket() {
 		this->close();
 	}
 }

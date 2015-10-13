@@ -12,8 +12,8 @@
 #ifndef DATA_PACKET_H_
 #define DATA_PACKET_H_
 
-#include "../Network/Packet.h"
 #include "InternalPacket.h"
+#include "../Network/Packet.h"
 
 namespace RakLib
 {
