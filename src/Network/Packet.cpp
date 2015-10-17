@@ -16,6 +16,8 @@ namespace RakLib
 
 	Packet::Packet() {
 		this->buffer = (uint8*)malloc(1024);
+		memset(this->buffer, 0x00, 1024);
+
 		this->position = 0;
 		this->length = 1024;
 	}
@@ -23,6 +25,8 @@ namespace RakLib
 
 	Packet::Packet(uint32 size) {
 		this->buffer = (uint8*)malloc(size);
+		memset(this->buffer, 0x00, size);
+
 		this->position = 0;
 		this->length = size;
 	}
@@ -30,6 +34,7 @@ namespace RakLib
 
 	Packet::Packet(uint8* buff, uint32 size) {
 		this->buffer = (uint8*)malloc(size);
+		memset(this->buffer, 0x00, size);
 		memcpy(this->buffer, buff, size);
 
 		this->position = 0;
@@ -49,15 +54,15 @@ namespace RakLib
 
 	void Packet::putByte(uint8 v) {
 		if (this->position > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->buffer[this->position++] = v;
 	}
 
-	void Packet::putByte(uint8* v, int size) {
+	void Packet::putByte(uint8* v, uint32 size) {
 		if (this->position + size > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		memcpy((this->buffer + this->position), v, size);
@@ -66,7 +71,7 @@ namespace RakLib
 
 	void Packet::putChar(char c) {
 		if (this->position > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->buffer[this->position++] = c;
@@ -74,7 +79,7 @@ namespace RakLib
 
 	void Packet::putShort(short v) {
 		if (this->position + 2 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->buffer[this->position++] = ((uint8)((v >> 8) & 0xFF));
@@ -83,7 +88,7 @@ namespace RakLib
 
 	void Packet::putInt(int v) {
 		if (this->position + 4 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->buffer[this->position++] = ((uint8)((v >> 24) & 0xFF));
@@ -94,7 +99,7 @@ namespace RakLib
 
 	void Packet::putTriad(int v) {
 		if (this->position + 3 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->buffer[this->position++] = ((uint8)((v >> 16) & 0xFF));
@@ -104,7 +109,7 @@ namespace RakLib
 
 	void Packet::putLTriad(int v) {
 		if (this->position + 3 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->buffer[this->position++] = ((uint8)((v      ) & 0xFF));
@@ -119,7 +124,7 @@ namespace RakLib
 
 	void Packet::putLong(long v) {
 		if (this->position + 8 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->buffer[this->position++] = ((uint8)((v >> 56) & 0xFF));
@@ -138,7 +143,7 @@ namespace RakLib
 
 	void Packet::putString(std::string str) {
 		if (this->position + (str.size() + 2) > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		this->putShort((short)str.length());
@@ -150,14 +155,14 @@ namespace RakLib
 	//Get Methods
 	uint8 Packet::getByte() {
 		if (this->position > this->length)
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 
 		return (uint8) this->buffer[this->position++];
 	}
 
 	uint8* Packet::getByte(uint32 size) {
 		if (this->position + size > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		uint8* temp = (uint8*)malloc(size);
@@ -168,7 +173,7 @@ namespace RakLib
 
 	char Packet::getChar() {
 		if (this->position > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		return (char)(this->buffer[this->position++] & 0xFF);
@@ -178,7 +183,7 @@ namespace RakLib
 	std::string Packet::getString() {
 		short size = getShort();
 		if (size <= 0 || this->position + size > this->length) {
-			throw new std::exception("Size not valid!");
+			throw std::exception("Size not valid!");
 		}
 
 		std::string temp = "";
@@ -190,7 +195,7 @@ namespace RakLib
 
 	short Packet::getShort() {
 		if (this->position + 2 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		return  (short)(((this->buffer[this->position++] << 8) & 0xFF) | (this->buffer[this->position++] & 0xFF));
@@ -198,7 +203,7 @@ namespace RakLib
 
 	int Packet::getTriad() {
 		if (this->position + 3 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		return (
@@ -210,7 +215,7 @@ namespace RakLib
 
 	int Packet::getLTriad() {
 		if (this->position + 3 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		return (
@@ -222,7 +227,7 @@ namespace RakLib
 
 	int Packet::getInt() {
 		if (this->position + 4 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		return (
@@ -238,7 +243,7 @@ namespace RakLib
 
 	long Packet::getLong() {
 		if (this->position + 8 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		return (long)(
@@ -254,7 +259,7 @@ namespace RakLib
 
 	uint64 Packet::getULong() {
 		if (this->position + 8 > this->length) {
-			throw new std::exception("BufferOverflow");
+			throw std::exception("BufferOverflow");
 		}
 
 		return (uint64)(
@@ -276,7 +281,7 @@ namespace RakLib
 
 	const uint8& Packet::operator[] (uint32 index) {
 		if (index > this->length) {
-			throw new std::exception("IndexOutOfBound");
+			throw std::exception("IndexOutOfBound");
 		}
 
 		return this->buffer[index];
@@ -301,20 +306,17 @@ namespace RakLib
 	}
 
 	void Packet::resize(size_t size) {
-		uint8* temp = (uint8*)malloc(size);
+		uint8* newBuffer = (uint8*)malloc(size);
+		memset(newBuffer, 0x00, size);
 
-		size_t  newSize = size;
-		if (newSize > this->length) {
-			newSize = this->length;
-		}
+		size_t newSize = (size > this->length) ? this->length : size;
 
-		memcpy(temp, this->buffer, newSize);
+		memcpy(newBuffer, this->buffer, newSize);
 		free(this->buffer);
-		this->buffer = temp;
-		if (this->position > newSize) {
-			this->position = newSize;
-		}
-		this->length = newSize;
+
+		this->buffer = newBuffer;
+		this->position = ((this->position > newSize) ? newSize : this->position);
+		this->length = size;
 	}
 
 	void Packet::print() {
@@ -329,6 +331,8 @@ namespace RakLib
 	void Packet::clear() {
 		free(this->buffer);
 		this->buffer = (uint8*)malloc(this->length);
+		memset(this->buffer, 0x00, this->length);
+
 		this->position = 0;
 	}
 

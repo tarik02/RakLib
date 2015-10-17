@@ -21,6 +21,14 @@ namespace RakLib
 		this->packetID = 0x84;
 	}
 
+	CustomPacket::~CustomPacket() {
+		this->close();
+		for (InternalPacket* pck : this->packets) {
+			pck->close();
+			delete pck;
+		}
+	}
+
 	uint32 CustomPacket::getLength() {
 		uint32 length = 4; // PacketID + sequence number(Triad)
 		for (InternalPacket* pck : this->packets) {
@@ -31,15 +39,14 @@ namespace RakLib
 
 	void CustomPacket::decode() {
 		this->packetID = this->getByte();
-		this->sequenceNumber = this->getTriad();
-		int size = this->length - 4;
-		this->packets = InternalPacket::fromBinary(this->getByte(size), size);
+		this->sequenceNumber = (uint32)this->getTriad();
+		this->packets = InternalPacket::fromBinary((this->buffer + this->position), this->length - 4);
 	}
 
 	void CustomPacket::encode() {
 		this->buffer = new uint8[this->getLength()];
 		this->putByte(this->packetID);
-		this->putLTriad(this->sequenceNumber);
+		this->putLTriad((int)this->sequenceNumber);
 		for (InternalPacket* pck : packets) {
 			Packet temp = pck->toBinary();
 			this->putByte(temp.getBuffer(), temp.getLength());

@@ -56,6 +56,7 @@ namespace RakLib
 			packet->buff = pck->getByte(packet->length);
 			packets.push_back(packet);
 		}
+		delete pck;
 
 		return packets;
 	}

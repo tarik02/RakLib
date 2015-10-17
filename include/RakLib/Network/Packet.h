@@ -43,7 +43,7 @@ namespace RakLib
 
 		//Write Methods
 		void putByte(uint8 v);
-		void putByte(uint8* v, int size);
+		void putByte(uint8* v, uint32 size);
 		void putChar(char c);
 		void putShort(short v);
 		void putTriad(int v);

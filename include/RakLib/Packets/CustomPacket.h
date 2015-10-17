@@ -20,20 +20,21 @@ namespace RakLib
 	{
 	public:
 		uint8 packetID;
-		int sequenceNumber;
+		uint32 sequenceNumber;
 		std::vector<InternalPacket*> packets;
 
 	public:
 		CustomPacket(Packet* packet);
 		CustomPacket(uint8* data, uint32 size);
 		CustomPacket();
-
+		~CustomPacket();
 
 		uint32 getLength();
 
 		void decode();
 
 		void encode();
+
 	};
 }
 #endif

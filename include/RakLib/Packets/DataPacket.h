@@ -20,12 +20,7 @@ namespace RakLib
 	class DataPacket : public Packet
 	{
 	public:
-		DataPacket(InternalPacket* pck)
-		{
-			this->buffer = pck->buff;
-			this->length = pck->length;
-			this->position = 0;
-		}
+		DataPacket(InternalPacket* pck) : Packet(pck->buff, pck->length) {}
 
 		DataPacket(Packet* packet) : Packet(packet) {}
 

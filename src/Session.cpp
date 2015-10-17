@@ -17,13 +17,18 @@ namespace RakLib
 			this->_updateQueue->packetID = 0x80;
 			this->_updateQueue->sequenceNumber = this->_sequenceNum++;
 			this->_updateQueue->encode();
+
 			this->sendPacket(this->_updateQueue);
+			this->_recoveryQueue[this->_updateQueue->sequenceNumber] = this->_updateQueue;
+
+			this->_updateQueue = new CustomPacket(nullptr, 0);
 		}
 
 		if (!this->_ACKQueue.empty()) {
 			Acknowledge ack(0xC0, this->_ACKQueue);
 			ack.encode();
 			this->sendPacket(&ack);
+			this->_ACKQueue.clear();
 		}
 
 		if (!this->_NACKQueue.empty()) {
@@ -36,17 +41,49 @@ namespace RakLib
 
 	//This method should only be called from RakLib
 	void Session::receivePacket(Packet* packet) {
+		uint8 packetID = packet->getBuffer()[0];
+		if (packetID == 0xC0) { // ACK
+			Acknowledge ack(packet);
+			ack.decode();
 
-		uint8 packetID = (*packet)[0];
-		if (packetID == 0xC0 || packetID == 0xA0) { // ACK and NACK
-			//TODO: Handle ACK and NACK
-			printf("Acknowledge packet: 0x%02X", packetID);
-		} else if (packetID >= 0x80 || packetID <= 0x8F) {  // Custom Packets Range
-			printf("CustomPacket Received: 0x%02X", packetID);
+			for (uint32 i : ack.sequenceNumbers) {
+				if (this->_recoveryQueue[i] != nullptr) {
+					delete this->_recoveryQueue[i];
+				}
+			}
+
+		} else if (packetID == 0xA0) { // NACK
+			Acknowledge nack(packet);
+			nack.decode();
+
+			for (uint32 i : nack.sequenceNumbers) {
+				if (this->_recoveryQueue[i] != nullptr) {
+					this->sendPacket(this->_recoveryQueue[i]);
+				}
+			}
+		} else if (packetID >= 0x80 && packetID <= 0x8F) {  // Custom Packets Range
 			CustomPacket customPacket(packet);
 			customPacket.decode();
 
 			this->_ACKQueue.push_back(customPacket.sequenceNumber);
+
+			//If this `if` is false then the custom packet was a lost packet
+			if (this->_sequenceNum < customPacket.sequenceNumber) {
+				this->_lastSequenceNum = this->_sequenceNum;
+				this->_sequenceNum = customPacket.sequenceNumber;
+
+				if (customPacket.sequenceNumber - this->_lastSequenceNum > 1) {
+					for (uint32 i = this->_lastSequenceNum + 1; i < this->_sequenceNum; i++) {
+						this->_NACKQueue.push_back(i);
+					}
+				}
+			} else {
+				for (uint32 i = 0; i < this->_NACKQueue.size(); i++) {
+					if (this->_NACKQueue[i] == customPacket.sequenceNumber) {
+						this->_NACKQueue.erase(this->_NACKQueue.begin() + i);
+					}
+				}
+			}
 
 			for (InternalPacket* internalPacket : customPacket.packets) {
 				//TODO: Handle splitted packets
@@ -72,18 +109,16 @@ namespace RakLib
 		internalPacket->length = packet->getLength();
 
 		if (priority == QueuePriority::IMMEDIATE) {
-			CustomPacket customPacket(nullptr, 0); 
-			customPacket.packetID = 0x80;
-			customPacket.sequenceNumber = this->_sequenceNum++;
+			CustomPacket* customPacket = new CustomPacket(nullptr, 0);
+			customPacket->packetID = 0x80;
+			customPacket->sequenceNumber = this->_sequenceNum++;
 			
 			//Add the data packet
-			customPacket.packets.push_back(internalPacket); 
-			customPacket.encode();
+			customPacket->packets.push_back(internalPacket); 
+			customPacket->encode();
 
-			this->sendPacket(&customPacket);
-
-			internalPacket->close();
-			delete internalPacket;
+			this->sendPacket(customPacket);
+			this->_recoveryQueue[customPacket->sequenceNumber] = customPacket; // When we receive a notification that this packet have been received, the packet will be destroyed.
 		} else if (priority == QueuePriority::UPDATE) {
 			this->_updateQueue->packets.push_back(internalPacket);
 		} else if (priority == QueuePriority::FULLQ) {
@@ -92,13 +127,11 @@ namespace RakLib
 				this->_normalQueue->packetID = 0x80;
 				this->_normalQueue->sequenceNumber = this->_sequenceNum++;
 				this->_normalQueue->encode();
-				this->sendPacket(this->_normalQueue);
 
-				for (InternalPacket* inPacket : this->_normalQueue->packets) {
-					inPacket->close();
-					delete inPacket;
-				}
-				this->_normalQueue->packets.clear();
+				this->sendPacket(this->_normalQueue);
+				this->_recoveryQueue[this->_normalQueue->sequenceNumber] = this->_normalQueue; // When we receive a notification that this packet have been received, the packet will be destroyed.
+
+				this->_normalQueue = new CustomPacket(nullptr, 0);
 			}
 
 		}

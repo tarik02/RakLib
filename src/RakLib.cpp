@@ -37,15 +37,16 @@ namespace RakLib
 			Packet* pck = this->_socket->receive();
 			uint8 pid = pck->getBuffer()[0];
 
+
+			printf("%02X\n", pid);
 			switch (pid) {
 			case Packets::UNCONNECTED_PONG:
 			case Packets::UNCONNECTED_PONG_2:
 			{
 				UnConnectedPing ping(pck);
 				ping.decode();
-					
 
-				UnConnectedPong pong(123456789, ping.pingID, "MCPE;Minecraft Server!;27;0.11.0;0;20");
+				UnConnectedPong pong(123456789, ping.pingID, "MCPE;Minecraft Server!;34;0.12.1;2;20");
 				pong.encode();
 
 				pong.ip = pck->ip;
@@ -90,9 +91,10 @@ namespace RakLib
 			default:
 			{
 				Session* session = this->_sessionManager->getSession(pck->ip, pck->port);
-				if (session == nullptr)
+				if (session == nullptr) {
 					break;
-
+				}
+				
 				session->receivePacket(pck);
 			}
 			break;

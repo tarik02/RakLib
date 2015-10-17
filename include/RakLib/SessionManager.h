@@ -17,7 +17,6 @@
 namespace RakLib
 {
 	class Session;
-
 	class SessionManager
 	{
 	public:
