@@ -14,15 +14,15 @@ namespace RakLib
 {
 
 	std::vector<InternalPacket*> InternalPacket::fromBinary(uint8* buffer, uint32 size) {
-		Packet* pck = new Packet(buffer, size);
 		std::vector<InternalPacket*> packets;
-		while (pck->getPosition() < pck->getLength()) {
+		Packet pck(buffer, size);
+		while (pck.getPosition() < pck.getLength()) {
 			InternalPacket* packet = new InternalPacket();
-			uint8 flags = pck->getByte();
+			uint8 flags = pck.getByte();
 			packet->reliability = (flags & 0xE0) >> 5;
 			packet->hasSplit = (flags & 0x10) > 0;
 
-			packet->length = (uint32)ceil(pck->getShort() / 8);
+			packet->length = (uint16)(pck.getShort() + 7) >> 3;
 
 			/*
 			* From http://www.jenkinssoftware.com/raknet/manual/reliabilitytypes.html
@@ -39,25 +39,23 @@ namespace RakLib
 			* 7: RELIABLE_ORDERED_WITH_ACK_RECEIPT
 			*/
 			if (packet->reliability == 2 || packet->reliability == 3 || packet->reliability == 4 || packet->reliability == 6 || packet->reliability == 7) {
-				packet->messageIndex = pck->getLTriad();
+				packet->messageIndex = pck.getLTriad();
 			}
 
 			if (packet->reliability == 1 || packet->reliability == 3 || packet->reliability == 4 || packet->reliability == 7) {
-				packet->orderIndex = pck->getLTriad();
-				packet->orderChannel = pck->getByte();
+				packet->orderIndex = pck.getLTriad();
+				packet->orderChannel = pck.getByte();
 			}
 
 			if (packet->hasSplit) {
-				packet->splitCount = pck->getInt();
-				packet->splitID = pck->getShort();
-				packet->splitIndex = pck->getInt();
+				packet->splitCount = pck.getInt();
+				packet->splitID = pck.getShort();
+				packet->splitIndex = pck.getInt();
 			}
 
-			packet->buff = pck->getByte(packet->length);
+			packet->buff = pck.getByte(packet->length);
 			packets.push_back(packet);
 		}
-		delete pck;
-
 		return packets;
 	}
 
@@ -66,6 +64,7 @@ namespace RakLib
 		Packet* packet = new Packet(getLength());
 		packet->putByte((uint8)((this->reliability << 5) | (this->hasSplit ? 0x01 : 0x00)));
 		packet->putShort((short)(this->length << 3));
+
 		if (this->reliability == 0x02 || this->reliability == 0x03 || this->reliability == 0x04 || this->reliability == 0x06 || this->reliability == 0x07) {
 			packet->putLTriad(this->messageIndex);
 		}

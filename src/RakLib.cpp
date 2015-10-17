@@ -37,8 +37,6 @@ namespace RakLib
 			Packet* pck = this->_socket->receive();
 			uint8 pid = pck->getBuffer()[0];
 
-
-			printf("%02X\n", pid);
 			switch (pid) {
 			case Packets::UNCONNECTED_PONG:
 			case Packets::UNCONNECTED_PONG_2:
@@ -46,7 +44,7 @@ namespace RakLib
 				UnConnectedPing ping(pck);
 				ping.decode();
 
-				UnConnectedPong pong(123456789, ping.pingID, "MCPE;Minecraft Server!;34;0.12.1;2;20");
+				UnConnectedPong pong(123456789, ping.pingID, "MCPE;Minecraft Server!;34;0.12.2;2;20");
 				pong.encode();
 
 				pong.ip = pck->ip;

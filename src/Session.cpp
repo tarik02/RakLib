@@ -89,11 +89,7 @@ namespace RakLib
 				//TODO: Handle splitted packets
 				DataPacket dataPacket(internalPacket);
 				this->handleDataPacket(&dataPacket);
-
-				internalPacket->close();
-				delete internalPacket;
 			}
-			customPacket.packets.clear();
 		} else {
 			printf("Unknown Packet: 0x%02X", packetID);
 		}

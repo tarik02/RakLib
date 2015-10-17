@@ -34,7 +34,6 @@ namespace RakLib
 
 	Packet::Packet(uint8* buff, uint32 size) {
 		this->buffer = (uint8*)malloc(size);
-		memset(this->buffer, 0x00, size);
 		memcpy(this->buffer, buff, size);
 
 		this->position = 0;
@@ -198,7 +197,10 @@ namespace RakLib
 			throw std::exception("BufferOverflow");
 		}
 
-		return  (short)(((this->buffer[this->position++] << 8) & 0xFF) | (this->buffer[this->position++] & 0xFF));
+		//WHY I CAN'T JUST DO: return (short) (((this->buffer[this->position++] << 8) & 0xFF) | (this->buffer[this->position++] & 0xFF)); 
+		//WTF??
+		this->position += 2;
+		return (short) (((this->buffer[this->position - 2] << 8) & 0xFF) | (this->buffer[this->position - 1] & 0xFF));
 	}
 
 	int Packet::getTriad() {
@@ -322,7 +324,7 @@ namespace RakLib
 	void Packet::print() {
 		for (uint32 i = 0; i < this->length; i++) {
 			printf("%02X ", this->buffer[i]);
-			if ((i != 0 && i % 8 == 0) || (i + 1) == this->length) {
+			if ((i + 1) % 8 == 0 || (i + 1) == this->length) {
 				printf("\n");
 			}
 		}

@@ -22,11 +22,11 @@ namespace RakLib
 	}
 
 	CustomPacket::~CustomPacket() {
-		this->close();
 		for (InternalPacket* pck : this->packets) {
 			pck->close();
 			delete pck;
 		}
+		this->packets.clear();
 	}
 
 	uint32 CustomPacket::getLength() {
@@ -40,7 +40,7 @@ namespace RakLib
 	void CustomPacket::decode() {
 		this->packetID = this->getByte();
 		this->sequenceNumber = (uint32)this->getTriad();
-		this->packets = InternalPacket::fromBinary((this->buffer + this->position), this->length - 4);
+		this->packets = InternalPacket::fromBinary(this->buffer + this->position, this->length - 4);
 	}
 
 	void CustomPacket::encode() {

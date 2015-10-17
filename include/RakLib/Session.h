@@ -60,7 +60,7 @@ namespace RakLib
 
 		virtual void receivePacket(Packet* packet);
 
-		virtual void handleDataPacket(const DataPacket& packet) = 0;
+		virtual void handleDataPacket(DataPacket* packet) = 0;
 
 		virtual void addToQueue(DataPacket* packet, QueuePriority priority);
 		virtual void sendPacket(Packet* packet) = 0; 
