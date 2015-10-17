@@ -68,10 +68,11 @@ namespace RakLib
 
 	Packet* UDPSocket::receive() {
 		struct sockaddr_in recv;
-		this->buffer = (unsigned char*)malloc(BUFFER_SIZE);
+		 uint8* buffer = (uint8*)malloc(BUFFER_SIZE);
+		 memset(buffer, 0, BUFFER_SIZE);
 
 		int sie = sizeof(struct sockaddr_in);
-		socklen_t size = recvfrom(this->sock, (char*)this->buffer, BUFFER_SIZE, 0, (struct sockaddr*)&recv, (socklen_t*)&sie);
+		socklen_t size = recvfrom(this->sock, (char*)buffer, BUFFER_SIZE, 0, (struct sockaddr*)&recv, (socklen_t*)&sie);
 
 		if (size == -1) {
 			std::cout << "Could not receive the packet! Error Code: ";
@@ -90,9 +91,11 @@ namespace RakLib
 		char ip[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &recv.sin_addr, ip, INET_ADDRSTRLEN);
 
-		Packet* pck = new Packet(buffer, (short)size);
+		Packet* pck = new Packet(buffer, (uint32)size);
 		pck->ip.assign(ip);
-		pck->port = (uint16_t)recv.sin_port;
+		pck->port = (uint16)recv.sin_port;
+
+		free(buffer);
 
 		return pck;
 	}
@@ -126,8 +129,6 @@ namespace RakLib
 		closesocket(this->sock);
 		WSACleanup();
 #endif
-
-		free(this->buffer);
 		this->isRuning = false;
 		this->isStarted = false;
 	}

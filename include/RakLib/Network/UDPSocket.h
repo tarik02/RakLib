@@ -44,7 +44,6 @@ namespace RakLib
 	class UDPSocket
 	{
 	private:
-		unsigned char* buffer;
 		bool isStarted;
 
 	#ifdef WIN32
