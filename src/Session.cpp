@@ -25,8 +25,10 @@ namespace RakLib
 		}
 
 		if (!this->_ACKQueue.empty()) {
+			printf("ACK SENDED\n");
 			Acknowledge ack(0xC0, this->_ACKQueue);
 			ack.encode();
+
 			this->sendPacket(&ack);
 			this->_ACKQueue.clear();
 		}
@@ -34,6 +36,7 @@ namespace RakLib
 		if (!this->_NACKQueue.empty()) {
 			Acknowledge nack(0xA0, this->_NACKQueue);
 			nack.encode();
+
 			this->sendPacket(&nack);
 		}
 	}
@@ -67,7 +70,7 @@ namespace RakLib
 
 			this->_ACKQueue.push_back(customPacket.sequenceNumber);
 
-			//If this `if` is false then the custom packet was a lost packet
+			//If this `if` is false then the custom packet is a lost packet
 			if (this->_sequenceNum < customPacket.sequenceNumber) {
 				this->_lastSequenceNum = this->_sequenceNum;
 				this->_sequenceNum = customPacket.sequenceNumber;
@@ -91,7 +94,9 @@ namespace RakLib
 				this->handleDataPacket(&dataPacket);
 			}
 		} else {
-			printf("Unknown Packet: 0x%02X", packetID);
+			//This packet is unknown. You could implement a plugin that handle unknown packet
+			DataPacket dataPacket(packet);
+			this->handleDataPacket(&dataPacket);
 		}
 	}
 

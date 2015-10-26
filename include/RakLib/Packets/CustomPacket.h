@@ -29,7 +29,7 @@ namespace RakLib
 		CustomPacket();
 		virtual ~CustomPacket();
 
-		uint32 getLength();
+		uint32 getTotalLength();
 
 		void decode();
 
